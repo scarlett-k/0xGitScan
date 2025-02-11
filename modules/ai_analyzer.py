@@ -15,7 +15,7 @@ def analyze_github_repos(repos):
         f"Analyze the following GitHub repositories for security risks:\n\n"
         f"Repositories: {repo_names}\n"
         f"Descriptions: {repo_descriptions}\n\n"
-        f"Provide insights on potential vulnerabilities/weak security practices and how a penetration tester can exploit them, and recommendations."
+        f"Provide insights on any vulnerabilities/weak security practices shown any files and how a penetration tester can exploit them, Refer to Top Security Vulnerabilities in GitHub Repositories. And then give recommendations on how to get rid of these risks or mitigate them."
     )
 
     response = ollama.chat(model="mistral", messages=[{"role": "user", "content": prompt}])
