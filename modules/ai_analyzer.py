@@ -10,6 +10,17 @@ HEADERS = {"Authorization": f"token {GITHUB_TOKEN}"} if GITHUB_TOKEN else {}
 if not GITHUB_TOKEN:
     print("⚠️ Warning: GITHUB_TOKEN is not set! Using unauthenticated API requests (rate limits apply).")
 
+# Uses github api to pull repos of given username. If successful, returns repos in json format. Else, returns error message
+def get_github_repos(username):    
+    url = f"https://api.github.com/users/{username}/repos" # checks to see if username is valid and exists in github and grabs the repos
+    response = requests.get(url)
+    
+    if response.status_code == 200: # if status code is 200 it was successfully found
+        return response.json()  # Returns repo details as JSON
+    else:
+        return {"error": "GitHub API request failed"}
+    
+    
 def get_repo_files(owner, repo):
     """Fetches a list of files in a given GitHub repository."""
     url = f"{GITHUB_API}/repos/{owner}/{repo}/contents/"
@@ -79,10 +90,10 @@ def analyze_github_repos(repos):
                 if code_content:
                     # print(f"\n🔍 **Fetched Code from {file['name']} in {repo_name}:**\n{code_content[:200]}...\n")
                     repo_code_snippets.append(f"### {file['name']}\n{code_content[:500]}")
-                else:
-                    print("❌ Skipping empty or unreadable file")
-            else:
-                print(f"❌ Skipping {file['name']} (Not a supported code file)")
+            #     else:
+            #         print("❌ Skipping empty or unreadable file")
+            # else:
+            #     print(f"❌ Skipping {file['name']} (Not a supported code file)")
 
     prompt = f"Analyze the following GitHub repositories for security risks:\n\nRepositories: {repo_names}\nDescriptions: {repo_descriptions}\n\nHere are extracted source code snippets:\n\n{repo_code_snippets}\n\nFind any security vulnerabilities in the repositories based on the actual source code."
 

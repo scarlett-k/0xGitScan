@@ -5,8 +5,7 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), "modules"))
 
 # ✅ Import modules (Fix import paths if needed)
-from modules.scraper_module import get_github_repos, get_github_user_info
-from modules.ai_analyzer import analyze_github_repos
+from modules.ai_analyzer import analyze_github_repos,  get_github_repos
 from modules.report_generator import generate_report
 
 # ✅ Ensure GITHUB_TOKEN is available
@@ -18,29 +17,29 @@ def main():
 
     username = input("🔍 Enter GitHub username: ")
     
-    print("\n📡 Fetching real-time OSINT data...")
+    print("\n📡 Fetching Github repos...")
     repos = get_github_repos(username)
 
     # ✅ Debug: Check what `repos` looks like
-    print(f"DEBUG: repos response = {repos}")
+    # print(f"DEBUG: repos response = {repos}")
 
     # ✅ Handle cases where repos are empty or API fails
     if not repos or isinstance(repos, dict) and "error" in repos:
         print(f"❌ Error: No repositories found or API issue.")
         return
-
+    #printing out the found repo names
     print(f"\n🔍 Found {len(repos)} repositories.")
     for repo in repos:
         print(f"- {repo['name']}")
 
-    print("\n📝 Checking repositories after fetching files...")
 
+    print("\n📝 Fetching files...")
     # Let ai_analyzer.py process and fetch files first
     ai_analysis = analyze_github_repos(repos)
 
     # ✅ Now print the actual fetched files
     for repo in repos:
-        if "files" in repo and isinstance(repo["files"], list) and repo["files"]:
+        if "files" in repo and isinstance(repo["files"], list) and repo["files"]: #ALEX HELP
             print(f"✅ {repo['name']} has {len(repo['files'])} files.")
         else:
             print(f"⚠️ {repo['name']} has no usable files or only unsupported ones.")
