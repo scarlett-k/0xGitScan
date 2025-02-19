@@ -70,7 +70,9 @@ def analyze_github_repos(repos):
         print(f"🔍 Found {len(files)} files in {repo_name}")
 
         for file in files:
-            if file["type"] == "file" and file["name"].endswith((".py", ".js", ".java", ".c", ".cpp", ".go")):
+            if file["type"] == "file" and file["name"].endswith((
+    ".py", ".js", ".java", ".c", ".cpp", ".go", ".yml", ".yaml", ".json", ".html", ".xml", ".travis.yml", ".gitignore", "robots.txt", ".env", ".swift")):
+
                 print(f"✅ Fetching: {file['name']}")
                 code_content = get_file_content(owner, repo_name, file["path"])
                 
