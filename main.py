@@ -5,7 +5,7 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), "modules"))
 
 # ✅ Import modules (Fix import paths if needed)
-from modules.ai_analyzer import analyze_github_repos,  get_github_repos
+from modules.ai_analyzer import analyze_github_repos, get_github_repos
 from modules.report_generator import generate_report
 
 # ✅ Ensure GITHUB_TOKEN is available
@@ -17,48 +17,46 @@ def main():
 
     username = input("🔍 Enter GitHub username: ")
     
-    print("\n📡 Fetching Github repos...")
+    print("\n📡 Fetching GitHub repos...")
     repos = get_github_repos(username)
-
-    # ✅ Debug: Check what `repos` looks like
-    # print(f"DEBUG: repos response = {repos}")
 
     # ✅ Handle cases where repos are empty or API fails
     if not repos or isinstance(repos, dict) and "error" in repos:
         print(f"❌ Error: No repositories found or API issue.")
         return
-    #printing out the found repo names
+
+    # ✅ Print found repositories
     print(f"\n🔍 Found {len(repos)} repositories.")
     for repo in repos:
         print(f"- {repo['name']}")
 
-
-    print("\n📝 Fetching files...")
-    # Let ai_analyzer.py process and fetch files first
-    ai_analysis = analyze_github_repos(repos)
-
-    # ✅ Now print the actual fetched files
+    print("\n📝 Fetching and analyzing repositories...")
+    
+    # ✅ Analyze each repository after fetching files
+    ai_findings = {}
     for repo in repos:
-        if "files" in repo and isinstance(repo["files"], list) and repo["files"]: #ALEX HELP
-            print(f"✅ {repo['name']} has {len(repo['files'])} files.")
-        else:
-            print(f"⚠️ {repo['name']} has no usable files or only unsupported ones.")
+        repo_name = repo["name"]
+        print(f"\n🔍 Processing repository: {repo_name}")
 
+        findings = analyze_github_repos([repo])  # ✅ Pass one repo at a time
+        
+        if findings and repo_name in findings:
+            ai_findings[repo_name] = findings[repo_name]  # ✅ Store findings only if issues are found
 
-    print("\n🧠 Running AI analysis with Ollama...")
-    ai_analysis = analyze_github_repos(repos)
-
-    # ✅ Handle AI response safely
-    if ai_analysis and "ai_analysis" in ai_analysis:
-        print("\n📌 AI Insights:")
-        print(ai_analysis["ai_analysis"])
+    # ✅ Print only if vulnerabilities are found
+    if ai_findings:
+        print("\n📌 AI-Detected Security Issues:")
+        for repo, files in ai_findings.items():
+            print(f"\n🔴 Security Findings in {repo}:")
+            for file, details in files.items():
+                print(f"\n📂 File: {file}\n{details}\n")
     else:
-        print("\n❌ AI analysis failed. Check API logs.")
+        print("\n✅ No major security vulnerabilities detected in any repositories.")
 
     # ✅ Generate and save report safely
     print("\n📄 Generating report...")
     try:
-        generate_report(username, repos, ai_analysis)
+        generate_report(username, repos, ai_findings)
         print("✅ Report successfully generated!")
     except Exception as e:
         print(f"❌ Failed to generate report: {e}")
