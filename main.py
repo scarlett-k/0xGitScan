@@ -1,65 +1,69 @@
 import sys
 import os
+import re
+import requests
 
-# 🔹 Ensure Python recognizes the "modules" directory
+# 🔹 Ensure Python recognizes the "modules" directory before importing
 sys.path.append(os.path.join(os.path.dirname(__file__), "modules"))
 
-# ✅ Import modules (Fix import paths if needed)
-from modules.ai_analyzer import analyze_github_repos, get_github_repos
-from modules.report_generator import generate_report
+from modules.ai_analyzer import analyze_github_repos, fetch_repo_files
 
-# ✅ Ensure GITHUB_TOKEN is available
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")  # Optional for public repos
+# ✅ Ensure GITHUB_TOKEN is available (Optional for public repos)
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")  
 HEADERS = {"Authorization": f"token {GITHUB_TOKEN}"} if GITHUB_TOKEN else {}
 
 def main():
-    print(f"🔑 GitHub Token Set: {'Yes ✅' if GITHUB_TOKEN else 'No ❌ (May hit rate limits)'}")
+    print("\n🔍 GitHub Security Scanner")
+    repo_url = input("🔗 Enter the GitHub repository URL: ").strip()
 
-    username = input("🔍 Enter GitHub username: ")
-    
-    print("\n📡 Fetching GitHub repos...")
-    repos = get_github_repos(username)
+    # ✅ Validate and extract username/repo name from URL
+    match = re.match(r"https://github\.com/([^/]+)/([^/]+)", repo_url)
+    if not match:
+        print("❌ Invalid GitHub URL format. Use: https://github.com/user/repo")
+        sys.exit(1)
 
-    # ✅ Handle cases where repos are empty or API fails
-    if not repos or isinstance(repos, dict) and "error" in repos:
-        print(f"❌ Error: No repositories found or API issue.")
-        return
+    username, repo_name = match.groups()
+    print(f"\n📡 Fetching repository files for {username}/{repo_name}...")
 
-    # ✅ Print found repositories
-    print(f"\n🔍 Found {len(repos)} repositories.")
-    for repo in repos:
-        print(f"- {repo['name']}")
+    repos = [{"name": repo_name, "owner": {"login": username}}]  # ✅ Prepare repo structure
+    files = fetch_repo_files(repos[0]["owner"]["login"], repos[0]["name"])  # ✅ Corrected function call
 
-    print("\n📝 Fetching and analyzing repositories...")
-    
-    # ✅ Analyze each repository after fetching files
-    ai_findings = {}
-    for repo in repos:
-        repo_name = repo["name"]
-        print(f"\n🔍 Processing repository: {repo_name}")
+    if not files:
+        print(f"❌ No files found in {repo_name}. Check if the repository exists, is public, or if the API request failed.")
+        sys.exit(1)
 
-        findings = analyze_github_repos([repo])  # ✅ Pass one repo at a time
-        
-        if findings and repo_name in findings:
-            ai_findings[repo_name] = findings[repo_name]  # ✅ Store findings only if issues are found
+    print(f"\n✅ {repo_name}: {len(files)} files fetched.")
 
-    # ✅ Print only if vulnerabilities are found
-    if ai_findings:
-        print("\n📌 AI-Detected Security Issues:")
-        for repo, files in ai_findings.items():
-            print(f"\n🔴 Security Findings in {repo}:")
-            for file, details in files.items():
-                print(f"\n📂 File: {file}\n{details}\n")
+    # ✅ Prepare repo data structure
+    repos = [{"name": repo_name, "owner": {"login": username}, "files": files}]
+
+    print("\n🧠 Running AI security analysis... (This may take a moment)")
+
+    # ✅ Run AI analysis on fetched files
+    ai_findings = analyze_github_repos(repos)
+
+    # ✅ Debugging: Ensure properly formatted AI findings before printing
+    print("\n🔍 DEBUG: Structured AI Findings (Before Display):")
+    for risk, issues in ai_findings.items():
+        print(f"{risk}: {len(issues)} issues")
+
+
+    # ✅ Print vulnerabilities grouped by risk level
+    if any(ai_findings.values()):
+        print("\n📌 AI-Detected Security Issues (Grouped by Risk Level):")
+
+        for risk_level, risk_header in [
+            ("High", "🔴 High Risk Issues"), 
+            ("Medium", "⚠️ Medium Risk Issues"), 
+            ("Low", "🟢 Low Risk / Best Practices")
+        ]:
+            if ai_findings[risk_level]:  
+                print(f"\n{risk_header}:")
+                for issue in ai_findings[risk_level]:
+                    print(issue.strip(), "\n")  # ✅ Strip whitespace for clean output
+
     else:
-        print("\n✅ No major security vulnerabilities detected in any repositories.")
-
-    # ✅ Generate and save report safely
-    print("\n📄 Generating report...")
-    try:
-        generate_report(username, repos, ai_findings)
-        print("✅ Report successfully generated!")
-    except Exception as e:
-        print(f"❌ Failed to generate report: {e}")
+        print("\n✅ No major security vulnerabilities detected.")
 
 if __name__ == "__main__":
     main()
