@@ -48,20 +48,32 @@ def analyze_file(owner, repo_name, file):
     snippet = content[:5000]  
 
     prompt = f"""
-    Analyze the security vulnerabilities in the following file: '{file['name']}'
+    You are a strict security analysis AI. Your task is to analyze security vulnerabilities in the following file: '{file['name']}'
     from the repository '{repo_name}'. Identify **only real security issues** and provide actionable recommendations.
-    Indicate the level of the issue by marking it as "High Risk", "Medium Risk" or "Low Risk". If a file has no security issue at all, then state "No security vulnerabilities found" for that file.
+
+    ### **STRICT RESPONSE FORMAT** (DO NOT DEVIATE):
+    Each issue must be structured exactly like this:
+    - **Issue Level:** High Risk / Medium Risk / Low Risk
+    - **Issue:** [Describe the security issue]
+    **Impact:** [Explain why this is dangerous]
+    **Recommendation:** [Provide a specific fix]
+
+    ---
+    **Important Rules:**
+    1️⃣ **DO NOT** include additional commentary or summaries.  
+    2️⃣ **DO NOT** provide explanations outside the required format.  
+    3️⃣ **DO NOT** generate any text unless it's strictly within the format above.  
+    4️⃣ **STRICTLY FOLLOW THE FORMAT ABOVE.** Any response not in this format will be rejected.  
+    5️⃣ **If no security vulnerabilities are found, return an EMPTY RESPONSE (no text at all).**  
 
     📌 **File Content for Analysis:**  
     ```{snippet}```  
-
-    ---
-    **Issues Format**:
-    - **Issue Level:** High Risk / Medium Risk / Low Risk
-    - **Issue:** [Describe the security issue]
-      **Impact:** [Explain why this is dangerous]
-      **Recommendation:** [Provide a specific fix]
     """
+
+    
+
+   
+
 
     response = ollama.chat(model="mistral", messages=[{"role": "user", "content": prompt}])
     ai_output = response.get("message", {}).get("content", "").strip()
