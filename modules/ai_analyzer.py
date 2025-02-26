@@ -48,25 +48,16 @@ def analyze_file(owner, repo_name, file):
     prompt = f"""
     Analyze the security vulnerabilities in the following file: '{file['name']}'
     from the repository '{repo_name}'. Identify **only real security issues** and provide actionable recommendations.
+    Indicate the level of the issue by marking it as "High Risk", "Medium Risk" or "Low Risk". If a file has no security issue at all, then state "No security vulnerabilities found" for that file.
 
     📌 **File Content for Analysis:**  
     ```{snippet}```  
 
     ---
-    **🔴 High Risk Issues**
+    **Issue Level:** Assign the issue exactly as "High Risk", "Medium Risk", or "Low Risk"
     - **Issue:** Describe the problem clearly.  
       **Impact:** Explain why this is dangerous.  
       ➜ **Recommendation:** Provide a specific fix.
-
-    **⚠️ Medium Risk Issues**
-    - **Issue:** Explain the security concern.  
-      **Impact:** Describe potential consequences.  
-      ➜ **Recommendation:** Offer an actionable fix.
-
-    **🟢 Low Risk / Best Practices**
-    - **Issue:** Mention a best practice or minor issue.  
-      **Impact:** Explain if relevant.  
-      ➜ **Recommendation:** Suggest an improvement.
     """
 
     response = ollama.chat(model="mistral", messages=[{"role": "user", "content": prompt}])
@@ -78,7 +69,6 @@ def analyze_file(owner, repo_name, file):
     return None  # ✅ Return None if AI finds no issues
 
 def analyze_github_repos(repos):
-    """Analyze GitHub repositories and categorize findings into High, Medium, and Low risk groups globally."""
     
     security_findings = {"High": [], "Medium": [], "Low": []}
 
@@ -103,49 +93,67 @@ def analyze_github_repos(repos):
         for result in results:
             if result:
                 file_name, ai_output = result
-
+                print(result)
                 # ✅ Extract individual vulnerabilities per severity level from AI output
                 current_risk_level = None
                 parsed_findings = {"High": [], "Medium": [], "Low": []}
 
                 for risk_level_marker, risk_level in [
-                    ("🔴 High Risk Issues", "High"),
-                    ("⚠️ Medium Risk Issues", "Medium"),
-                    ("🟢 Low Risk / Best Practices", "Low"),
+                    ("High Risk", "High"),
+                    ("Medium Risk", "Medium"),
+                    ("Low Risk", "Low"),
                 ]:
                     if risk_level_marker in ai_output:
-                        findings_block = ai_output.split(risk_level_marker)[1].strip()  # Extract findings under this risk level
+                        findings_block = ai_output.split(risk_level_marker, 1)[-1].strip()  # Ensure only the first split happens
 
-                        # ✅ Remove risk level markers from appearing inside issue entries
+                #         # ✅ Remove risk level markers from appearing inside issue entries
                         findings_block = findings_block.replace("🔴 High Risk Issues", "").replace("⚠️ Medium Risk Issues", "").replace("🟢 Low Risk / Best Practices", "")
 
-                        # ✅ Split issues while keeping "Issue", "Impact", and "Recommendation" together
-                        issues = re.split(r"- \*\*Issue:\*\*", findings_block)[1:]  # Split only on properly formatted issues
+                #         # ✅ Split issues while keeping "Issue", "Impact", and "Recommendation" together
+                        issues = re.split(r"- \*\*Issue:\*\*", findings_block)[1:]
 
+                        # ✅ Prevent broken Markdown code blocks
+                        issues = [issue.replace("```", "").strip() for issue in issues if issue.strip()]
+
+                        seen_issues = set()
                         for issue in issues:
                             issue_lines = issue.strip().split("\n")
-
-                            # ✅ Remove stray/blank "Issue:" entries
-                            issue_lines = [line for line in issue_lines if line.strip() and line.strip() != "**Issue:**"]
-
-                            if not issue_lines:
-                                continue  # Skip empty issues
-
-                            # ✅ Format correctly, ensuring all parts are grouped properly
                             formatted_issue = f"📂 **{repo_name}** ({file_name})"
+                            
                             for part in issue_lines:
-                                if "**Impact:**" in part or "➜ **Recommendation:**" in part:
+                                if "**Issue:**" in part or "**Impact:**" in part or "➜ **Recommendation:**" in part:
                                     formatted_issue += f"\n  - {part.strip()}"
                                 else:
-                                    formatted_issue += f"\n  - **Issue:** {part.strip()}"
+                                    formatted_issue += f"\n    {part.strip()}"  # Prevent adding unnecessary **Issue:** markers
 
-                            # ✅ Ensure risk levels appear ONLY ONCE in `main.py`
-                            parsed_findings[risk_level].append(formatted_issue)
+                            if formatted_issue not in seen_issues:
+                                parsed_findings[risk_level].append(formatted_issue)
+                                seen_issues.add(formatted_issue)
+
+                        # for issue in issues:
+                            # issue_lines = issue.strip().split("\n")
+
+                #             # ✅ Remove stray/blank "Issue:" entries
+                            # issue_lines = [line for line in issue_lines if line.strip() and line.strip() != "**Issue:**"]
+
+                            # if not issue_lines:
+                                # continue  # Skip empty issues
+
+                #             # ✅ Format correctly, ensuring all parts are grouped properly
+                            # formatted_issue = f"📂 **{repo_name}** ({file_name})"
+                            # for part in issue_lines:
+                                # if "**Impact:**" in part or "➜ **Recommendation:**" in part:
+                                    # formatted_issue += f"\n  - {part.strip()}"
+                                # else:
+                                    # formatted_issue += f"\n  - **Issue:** {part.strip()}"
+
+                #             # ✅ Ensure risk levels appear ONLY ONCE in `main.py`
+                            # parsed_findings[risk_level].append(formatted_issue)
 
 
 
 
-                # ✅ Append results only if there are findings
+                # # ✅ Append results only if there are findings
                 for risk_level in ["High", "Medium", "Low"]:
                     if parsed_findings[risk_level]:
                         security_findings[risk_level].extend(parsed_findings[risk_level])
