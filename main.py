@@ -55,7 +55,7 @@ def main():
         for risk_level, risk_header in [
             ("High", "🔴 High Risk Issues"), 
             ("Medium", "⚠️ Medium Risk Issues"), 
-            ("Low", "🟢 Low Risk / Best Practices")
+            ("Low", "🟢 Low Risk/Best Practices")
         ]:
             if ai_findings[risk_level]:  
                 print(f"\n{risk_header}:")
