@@ -36,7 +36,6 @@ def get_file_content(owner, repo_name, file_path):
         content_data = response.json()
         if "content" in content_data and content_data.get("encoding") == "base64":
             return base64.b64decode(content_data["content"]).decode("utf-8", errors="ignore")
-    
     return None
 
 def analyze_file(owner, repo_name, file):
@@ -45,7 +44,7 @@ def analyze_file(owner, repo_name, file):
     if not content:
         return None  
 
-    snippet = content[:5000]  
+    snippet = content[:5000]
 
     prompt = f"""
     You are a strict security analysis AI. Your task is to analyze security vulnerabilities in the following file: '{file['name']}'
@@ -60,22 +59,18 @@ def analyze_file(owner, repo_name, file):
 
     ---
     **Important Rules:**
-    1️⃣ **DO NOT** include additional commentary or summaries.  
-    2️⃣ **DO NOT** provide explanations outside the required format.  
-    3️⃣ **DO NOT** generate any text unless it's strictly within the format above.  
-    4️⃣ **STRICTLY FOLLOW THE FORMAT ABOVE.** Any response not in this format will be rejected.  
-    5️⃣ **If no security vulnerabilities are found, return an EMPTY RESPONSE (no text at all).**  
+    1️ **DO NOT** include additional commentary or summaries.  
+    2️ **DO NOT** provide explanations outside the required format.  
+    3️ **DO NOT** generate any text unless it's strictly within the format above.  
+    4️ **STRICTLY FOLLOW THE FORMAT ABOVE.** Any response not in this format will be rejected.  
+    5️ **If no security vulnerabilities are found, return an EMPTY RESPONSE (no text at all).**  
 
-    📌 **File Content for Analysis:**  
+     **File Content for Analysis:**  
     ```{snippet}```  
     """
 
+    response = ollama.chat(model="llama3", messages=[{"role": "user", "content": prompt}])
     
-
-   
-
-
-    response = ollama.chat(model="mistral", messages=[{"role": "user", "content": prompt}])
     ai_output = response.get("message", {}).get("content", "").strip()
     
     if ai_output:
@@ -150,8 +145,8 @@ def analyze_github_repos(repos):
                 for risk_level in ["High", "Medium", "Low"]:
                     security_findings[risk_level].extend(parsed_findings[risk_level])
 
-    print("\n🔍 DEBUG: Processed AI Findings:")
-    for level, findings in security_findings.items():
-        print(f"{level}: {len(findings)} issues found.")
+    # print("\n🔍 DEBUG: Processed AI Findings:")
+    # for level, findings in security_findings.items():
+    #     print(f"{level}: {len(findings)} issues found.")
 
     return security_findings

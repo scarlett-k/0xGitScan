@@ -23,7 +23,7 @@ def main():
         sys.exit(1)
 
     username, repo_name = match.groups()
-    print(f"\n📡 Fetching repository files for {username}/{repo_name}...")
+    print(f"\nFetching repository files for {username}/{repo_name}...")
 
     repos = [{"name": repo_name, "owner": {"login": username}}]  # ✅ Prepare repo structure
     files = fetch_repo_files(repos[0]["owner"]["login"], repos[0]["name"])  # ✅ Corrected function call
@@ -42,12 +42,6 @@ def main():
     # ✅ Run AI analysis on fetched files
     ai_findings = analyze_github_repos(repos)
 
-    # ✅ Debugging: Ensure properly formatted AI findings before printing
-    print("\n🔍 DEBUG: Structured AI Findings (Before Display):")
-    for risk, issues in ai_findings.items():
-        print(f"{risk}: {len(issues)} issues")
-
-
     # ✅ Print vulnerabilities grouped by risk level
     if any(ai_findings.values()):
         print("\n📌 AI-Detected Security Issues (Grouped by Risk Level):")
@@ -55,7 +49,7 @@ def main():
         for risk_level, risk_header in [
             ("High", "🔴 High Risk Issues"), 
             ("Medium", "⚠️ Medium Risk Issues"), 
-            ("Low", "🟢 Low Risk/Best Practices")
+            ("Low", "🟢 Low Risk Issues")
         ]:
             if ai_findings[risk_level]:  
                 print(f"\n{risk_header}:")
