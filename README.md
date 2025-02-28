@@ -1,4 +1,5 @@
 ## General info
+![image](https://github.com/user-attachments/assets/5fc4ab07-4808-464f-98fb-6c346e1ef45c)
 
 ### Features
 - AI-driven vulnerability analysis with structured findings (Issue → Impact → Recommendation)
