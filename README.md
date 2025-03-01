@@ -1,5 +1,5 @@
 ## General info
-I built a Python-based tool that scans Github repositories and automates vulnerability detection using AI.
+I built a Python-based tool that integrates with the GitHub API to scan Github repositories and automates vulnerability detection using AI. The tool identifies security risks, assesses their impact, and provides actionable remediation recommendations to enhance code security.
 ![image](https://github.com/user-attachments/assets/5fc4ab07-4808-464f-98fb-6c346e1ef45c)
 
 ### Features
