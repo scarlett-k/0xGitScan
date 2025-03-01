@@ -19,7 +19,7 @@ Project is created with:
 #### **Install Dependencies**
 Ensure you have **Python 3.8+** installed. Then, clone the repository and install required dependencies:
 ```bash
-git clone [https://github.com/yourusername/github-repo-scanner.git](https://github.com/scarlett-k/0xGitScan)
+git clone https://github.com/scarlett-k/0xGitScan
 cd github-repo-scanner
 pip install -r requirements.txt
 ```
