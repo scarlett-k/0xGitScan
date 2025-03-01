@@ -8,7 +8,6 @@ Python-based tool that integrates with the GitHub API to scan Github repositorie
 - Supports multiple programming languages (Python, JavaScript, C, Java, YAML, etc.)
 - Optimized for scanning individual repositories quickly
 
-	
 ## Technologies
 Project is created with:
 * Python 3.12.4
@@ -20,7 +19,7 @@ Project is created with:
 #### **Install Dependencies**
 Ensure you have **Python 3.8+** installed. Then, clone the repository and install required dependencies:
 ```bash
-git clone https://github.com/yourusername/github-repo-scanner.git
+git clone [https://github.com/yourusername/github-repo-scanner.git](https://github.com/scarlett-k/0xGitScan)
 cd github-repo-scanner
 pip install -r requirements.txt
 ```
