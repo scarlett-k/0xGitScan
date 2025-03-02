@@ -47,8 +47,8 @@ def analyze_file(owner, repo_name, file):
     snippet = content[:5000]
 
     prompt = f"""
-    You are a strict security analysis AI. Your task is to analyze security vulnerabilities in the following file: '{file['name']}'
-    from the repository '{repo_name}'. Identify **only real security issues** and provide actionable recommendations.
+    You are a security analysis AI. Your task is to analyze security vulnerabilities in the following file: '{file['name']}'
+    from the repository '{repo_name}'. Identify any security issues and provide actionable recommendations.
 
     ### **STRICT RESPONSE FORMAT** (DO NOT DEVIATE):
     Each issue must be structured exactly like this:
@@ -106,7 +106,6 @@ def extract_findings(ai_output, repo_name, file_name):
                 for part in issue_lines:
                     if "**Issue Level:**" in part:
                         continue  
-
                     if "**Issue:**" in part or "**Impact:**" in part or "**Recommendation:**" in part:
                         formatted_issue += f"\n  - {part.strip()}"
                     else:
@@ -128,8 +127,10 @@ def analyze_github_repos(repos):
         files = repo.get("files", [])
 
         code_files = [file for file in files if file["name"].endswith(
-            (".py", ".js", ".java", ".c", ".cpp", ".go", ".yml", ".yaml",
-             ".json", ".html", ".xml", ".travis.yml", ".gitignore", "robots.txt", ".env", ".swift"))]
+        (".py", ".js", ".ts", ".java", ".c", ".cpp", ".cs", ".go", ".php", ".rb",
+        ".sh", ".kt", ".rs", ".m", ".pl", ".scala", ".yml", ".yaml", ".json",
+        ".html", ".xml", ".travis.yml", ".gitignore", "robots.txt", ".env", ".swift"))]
+
 
         if not code_files:
             continue  
