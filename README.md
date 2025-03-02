@@ -1,6 +1,6 @@
 ## General info
-I built a Python-based tool that scans Github repositories and automates vulnerability detection using AI.
-![image](https://github.com/user-attachments/assets/5fc4ab07-4808-464f-98fb-6c346e1ef45c)
+Python-based tool that integrates with the GitHub API to scan Github repositories and automates vulnerability detection using AI. The tool identifies security risks, assesses their impact, and provides actionable remediation recommendations to enhance code security.
+![image](https://github.com/user-attachments/assets/734101e8-779c-4841-85aa-35c667dcb88b)
 
 ### Features
 - Analyzes github files for vulnearabilities using AI and provides structured findings (Issue → Impact → Recommendation)
@@ -8,7 +8,6 @@ I built a Python-based tool that scans Github repositories and automates vulnera
 - Supports multiple programming languages (Python, JavaScript, C, Java, YAML, etc.)
 - Optimized for scanning individual repositories quickly
 
-	
 ## Technologies
 Project is created with:
 * Python 3.12.4
@@ -20,7 +19,7 @@ Project is created with:
 #### **Install Dependencies**
 Ensure you have **Python 3.8+** installed. Then, clone the repository and install required dependencies:
 ```bash
-git clone https://github.com/yourusername/github-repo-scanner.git
+git clone https://github.com/scarlett-k/0xGitScan
 cd github-repo-scanner
 pip install -r requirements.txt
 ```
