@@ -1,7 +1,6 @@
 import sys
 import os
 import re
-import requests
 
 # 🔹 Ensure Python recognizes the "modules" directory before importing
 sys.path.append(os.path.join(os.path.dirname(__file__), "modules"))
