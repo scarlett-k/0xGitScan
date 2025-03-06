@@ -41,6 +41,12 @@ For scanning private repositories, set up a GitHub API token:
 export GITHUB_TOKEN=your_personal_access_token  # macOS/Linux
 set GITHUB_TOKEN=your_personal_access_token     # Windows (CMD)
 ```
+#### **Customizing the LLM Model (Optional)**
+By default, this project uses Llama 3 as the language model. However, you can easily switch to a different model supported by Ollama by modifying the model parameter in the following line of code:
+```
+response = ollama.chat(model="llama3", messages=[{"role": "user", "content": prompt}])
+```
+To use a different model, simply replace "llama3" with the name of your preferred LLM.
 #### **Run the Scanner**
 ```
 python main.py
