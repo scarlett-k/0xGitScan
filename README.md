@@ -27,11 +27,15 @@ pip install -r requirements.txt
 ```
 curl -fsSL https://ollama.com/install.sh | sh
 ```
-#### **Install Ollama (Windows - Using Scoop)**
+
+#### **Install Ollama (Windows)**
+Download Ollama for Windows from the official website: https://ollama.com/download                                 
+Run the installer and follow the setup instructions.
+After installation, verify it's working by opening PowerShell or Command Prompt and running:
 ```
-scoop install ollama
+ollama --version
 ```
-#### **Pull Llama 3 model**
+#### **Pull Llama 3 model (or whatever model you'd like to use!)**
 ```
 ollama pull llama3
 ```
